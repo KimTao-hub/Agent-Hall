@@ -5,10 +5,11 @@ import express from 'express';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { Agent } from './agent';
+import { xiaohongshuService } from './xiaohongshuService';
 import winston from 'winston';
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8015;
 
 // 配置日志记录
 const logger = winston.createLogger({
@@ -65,7 +66,7 @@ app.get('/health', (req, res) => {
 /**
  * @swagger
  * /chat: 
- *   post:
+ *   post: 
  *     summary: 发送聊天消息
  *     description: 发送消息给AI助手并获取响应
  *     requestBody:
@@ -111,6 +112,64 @@ app.post('/chat', async (req, res) => {
     res.end();
   } catch (error) {
     logger.error('Error in /chat endpoint:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /xiaohongshu/copy: 
+ *   post: 
+ *     summary: 生成小红书文案
+ *     description: 根据场景和配置生成小红书风格的文案
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               scene: 
+ *                 type: string
+ *                 description: 文案场景
+ *               config: 
+ *                 type: object
+ *                 description: 场景配置参数
+ *     responses:
+ *       200: 
+ *         description: 成功生成文案
+ *       400: 
+ *         description: 请求参数错误
+ *       500: 
+ *         description: 服务器内部错误
+ */
+app.post('/xiaohongshu/copy', async (req, res) => {
+  try {
+    const { scene, config } = req.body;
+    
+    if (!scene || typeof scene !== 'string') {
+      logger.warn('Invalid scene parameter', { body: req.body });
+      res.status(400).json({ error: 'Invalid scene' });
+      return;
+    }
+
+    if (!config || typeof config !== 'object') {
+      logger.warn('Invalid config parameter', { body: req.body });
+      res.status(400).json({ error: 'Invalid config' });
+      return;
+    }
+
+    logger.info('Received Xiaohongshu copy request', { scene });
+
+    const result = await xiaohongshuService.generateCopy({ scene, config });
+    logger.info('Generated Xiaohongshu copy successfully');
+
+    res.json(result);
+  } catch (error) {
+    logger.error('Error in /xiaohongshu/copy endpoint:', {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined
     });

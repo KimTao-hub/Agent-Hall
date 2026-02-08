@@ -1,65 +1,143 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
-import { useChat } from './hooks/useChat';
-import ThoughtTrace from './components/ThoughtTrace'; // Uncomment when implemented
+import { useState, useCallback } from 'react';
+import SceneSelector from './components/SceneSelector';
+import SceneConfig from './components/SceneConfig';
+import CopyEditor from './components/CopyEditor';
+import CopyPreview from './components/CopyPreview';
 
 export default function Home() {
-  const { messages, sendMessage, loading } = useChat();
-  const [input, setInput] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [selectedScene, setSelectedScene] = useState<string | null>(null);
+  const [sceneConfig, setSceneConfig] = useState<any>({});
+  const [generatedCopy, setGeneratedCopy] = useState<string>('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || loading) return;
-    sendMessage(input);
-    setInput('');
+  const handleSceneSelect = useCallback((sceneId: string) => {
+    setSelectedScene(sceneId);
+    setGeneratedCopy('');
+  }, []);
+
+  const handleConfigChange = useCallback((config: any) => {
+    setSceneConfig(config);
+  }, []);
+
+  const handleCopyChange = useCallback((content: string) => {
+    setGeneratedCopy(content);
+  }, []);
+
+  const generateCopy = async () => {
+    if (!selectedScene) {
+      alert('请先选择一个文案场景');
+      return;
+    }
+
+    // 验证必填字段
+    const requiredFields = getRequiredFields(selectedScene);
+    const missingFields = requiredFields.filter(field => !sceneConfig[field]?.trim());
+    if (missingFields.length > 0) {
+      alert(`请填写必填字段：${missingFields.join('、')}`);
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8015';
+      const response = await fetch(`${API_URL}/xiaohongshu/copy`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          scene: selectedScene,
+          config: sceneConfig
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setGeneratedCopy(data.copy);
+    } catch (error) {
+      console.error('生成文案失败:', error);
+      alert('生成文案失败，请稍后重试');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  const getRequiredFields = (sceneId: string): string[] => {
+    const requiredFieldsMap: Record<string, string[]> = {
+      beauty: ['productName', 'brand', 'usageFeel', 'effect', 'recommendation'],
+      fashion: ['clothingType', 'style', 'matchingTips', 'scenario', 'usageFeel'],
+      travel: ['destination', 'duration', 'attractions', 'food', 'tips', 'experience'],
+      food: ['restaurantName', 'location', 'cuisineType', 'signatureDishes', 'taste', 'recommendation'],
+      home: ['productName', 'category', 'usageScenario', 'functionality', 'usageFeel', 'recommendation'],
+      fitness: ['workoutType', 'benefits', 'experience', 'tips'],
+      parenting: ['babyAge', 'topic', 'problem', 'solution', 'experience', 'tips'],
+      tech: ['productName', 'brand', 'specs', 'performance', 'userExperience', 'pros', 'recommendation']
+    };
+    return requiredFieldsMap[sceneId] || [];
+  };
 
   return (
     <main className="container">
       <header style={{ marginBottom: '2rem', textAlign: 'center' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 700, backgroundImage: 'linear-gradient(to right, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
-          Research Agent
+          小红书文案编辑Agent
         </h1>
-        <p style={{ color: '#94a3b8' }}>Coding Challenge</p>
+        <p style={{ color: '#94a3b8' }}>智能生成八大场景优质文案</p>
       </header>
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', overflowY: 'auto', paddingBottom: '2rem' }}>
-        {/* 使用?链操作符,避免数据块损坏导致前端崩溃 */}
-        {messages?.length > 0 && messages.map((msg, i) => (
-          <div key={i} className={`chat-message ${msg.role === 'user' ? 'user-message' : 'bot-message'}`}>
-            {msg?.content}
-          </div>
-        ))}
+      {/* 场景选择 */}
+      <SceneSelector
+        selectedScene={selectedScene}
+        onSelectScene={handleSceneSelect}
+      />
 
-        {loading && (
-          <div style={{ color: '#94a3b8', fontStyle: 'italic', paddingLeft: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            {/* TASK: Render the ThoughtTrace component here when active */}
-            <ThoughtTrace loading={loading}/>
-            <p>Agent is thinking... (This can take a while)</p>
-          </div>
-        )}
+      {/* 场景参数配置 */}
+      <SceneConfig
+        sceneId={selectedScene}
+        onConfigChange={handleConfigChange}
+      />
 
-        <div ref={messagesEndRef} />
-      </div>
-
-      <form onSubmit={handleSubmit} style={{ position: 'sticky', bottom: 0, background: 'var(--background)', padding: '1rem 0' }}>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask me a question..."
+      {/* 生成按钮 */}
+      {selectedScene && (
+        <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+          <button
+            onClick={generateCopy}
             disabled={loading}
-          />
-          <button type="submit" disabled={loading}>
-            {loading ? '...' : 'Send'}
+            style={{
+              padding: '1rem 3rem',
+              backgroundColor: '#60a5fa',
+              color: 'white',
+              border: 'none',
+              borderRadius: '0.5rem',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              fontSize: '1.1rem',
+              fontWeight: 600,
+              transition: 'background 0.2s',
+              opacity: loading ? 0.5 : 1
+            }}
+          >
+            {loading ? '生成中...' : '生成文案'}
           </button>
         </div>
-      </form>
+      )}
+
+      {/* 文案编辑 */}
+      <CopyEditor
+        initialContent={generatedCopy}
+        onContentChange={handleCopyChange}
+        loading={loading}
+      />
+
+      {/* 文案预览 */}
+      <CopyPreview
+        content={generatedCopy}
+        sceneId={selectedScene}
+      />
     </main>
   );
 }
