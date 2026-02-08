@@ -36,27 +36,27 @@
 ### 2.2 OpenAI服务模块 (`src/openaiService.ts`)
 - **功能**: 封装OpenAI SDK调用，处理AI模型请求
 - **核心功能**:
-  - 初始化OpenAI实例，配置DeepSeek API
-  - 实现聊天对话功能，支持流式响应
-  - 提供详细的日志记录
-  - 处理API调用错误
+  - 初始化OpenAI实例，配置DeepSeek API 
+  - 实现聊天对话功能，支持流式响应 (createChatCompletion,createChatCompletionStream)
+  - 提供详细的日志记录 (记录请求参数、响应数据、错误信息)
+  - 处理API调用错误 (捕获OpenAI SDK异常，返回友好错误提示)s
 
 ### 2.3 Agent模块 (`src/agent.ts`)
 - **功能**: 维护对话上下文，管理聊天历史
 - **核心功能**:
-  - 管理对话历史记录
-  - 自动裁剪过长的历史记录
-  - 调用OpenAI服务生成响应
-  - 处理流式响应的回调
+  - 管理对话历史记录 (addMessage、getHistory、clearHistory)
+  - 自动裁剪过长的历史记录 (trimHistory,保存20条)
+  - 调用OpenAI服务生成响应 (generateResponse ->createChatCompletionStream)
+  - 处理流式响应的回调 (onChunk)
 
 ### 2.4 服务器模块 (`src/index.ts`)
 - **功能**: 提供HTTP API端点，处理客户端请求
 - **核心功能**:
-  - 配置Express中间件
-  - 实现API端点
-  - 处理请求限流
-  - 提供健康检查
-  - 全局错误处理
+  - 配置Express中间件 (CORS、JSON解析、日志记录)
+  - 实现API端点 (POST /chat, GET /history, POST /clear, GET /health)
+  - 处理请求限流 (express-rate-limit)
+  - 提供健康检查 (GET /health)
+  - 全局错误z处理 --中间件(捕获所有未处理异常)
 
 ## 3. 主要业务流程
 

@@ -59,11 +59,11 @@ interface ChatResponse {
     index: number;
     message: {
       role: 'assistant';
-      content: string;
+      content: string | null;
     };
     finish_reason: string;
   }>;
-  usage: {
+  usage?: {
     prompt_tokens: number;
     completion_tokens: number;
     total_tokens: number;
@@ -93,15 +93,15 @@ export class OpenAIService {
         messages: request.messages,
         model: request.model || 'deepseek-chat',
         temperature: request.temperature || 0.7,
-        stream: request.stream || false
-      });
+        stream: false
+      }) as OpenAI.ChatCompletion;
 
       const endTime = Date.now();
       logger.info('Chat completion created successfully', {
         response: {
           id: completion.id,
           model: completion.model,
-          choices: completion.choices.map(choice => ({
+          choices: completion.choices.map((choice: any) => ({
             index: choice.index,
             message: {
               role: choice.message.role,
