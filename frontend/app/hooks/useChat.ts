@@ -27,7 +27,7 @@ export function useChat() {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+     //处理流式传输：以消费流式响应而不是等待完整文本。
       const reader = response.body?.getReader();
       if (!reader) {
         throw new Error('No response body');
