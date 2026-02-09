@@ -1,8 +1,7 @@
-import OpenAI from "openai";
-import winston from "winston";
 
 // 导入现有的 OpenAI 实例
 import { openai } from './openaiService';
+import logger from './logger';
 
 interface XiaohongshuCopyRequest {
   scene: string;
@@ -13,18 +12,6 @@ interface XiaohongshuCopyResponse {
   copy: string;
 }
 
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' })
-  ]
-});
 
 class XiaohongshuService {
   /**

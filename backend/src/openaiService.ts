@@ -1,27 +1,6 @@
-// 其他模块导入
 import OpenAI from "openai";
-import winston from "winston";
-import fs from 'fs';
-import path from 'path';
+import logger from './logger';
 
-const logsDir = path.join(__dirname, '..', 'logs');
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
-}
-
-// 配置日志记录
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' })
-  ]
-});
 
 // 创建OpenAI实例
 const apiKey = process.env.DEEPSEEK_API_KEY || '';

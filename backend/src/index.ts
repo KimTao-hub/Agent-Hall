@@ -6,24 +6,11 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { Agent } from './agent';
 import { xiaohongshuService } from './xiaohongshuService';
-import winston from 'winston';
+import logger from './logger';
 
 const app = express();
 const PORT = process.env.PORT || 8015;
 
-// 配置日志记录
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' })
-  ]
-});
 
 // 确保logs目录存在
 import fs from 'fs';
