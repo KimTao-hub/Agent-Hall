@@ -1,10 +1,10 @@
 'use client';
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import SceneSelector from '../components/SceneSelector';
-import SceneConfig from '../components/SceneConfig';
-import CopyEditor from '../components/CopyEditor';
-import CopyPreview from '../components/CopyPreview';
+import SceneSelector from './components/SceneSelector';
+import SceneConfig from './components/SceneConfig';
+import CopyEditor from './components/CopyEditor';
+import CopyPreview from './components/CopyPreview';
 
 export default function XiaohongshuAgent() {
   const router = useRouter();
