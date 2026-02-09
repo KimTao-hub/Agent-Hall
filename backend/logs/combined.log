@@ -65,3 +65,5 @@
 {"level":"info","message":"Generated prompt","prompt":"请为以下旅行目的地生成一篇小红书风格的打卡攻略文案：\n\n目的地：上海\n行程天数：5天\n最佳时间：春天、秋天\n预算：3500\n主要景点：东方明珠、北外滩、上海历史博物馆、上海博物馆、陆家嘴、迪士尼\n特色美食：水煎包、白斩鸡、粤菜、日料、本帮菜、印度菜，外国餐厅\n住宿推荐：人民广场、静安寺\n交通方式：地铁\n旅行贴士：夏天，上海天气炎热，节假日迪士尼、外滩人多，注意避坑\n个人体验：避开人流，就是完美的上...","timestamp":"2026-02-08T12:10:06.234Z"}
 {"copy":"1️⃣ **吸引人的标题**\n魔都5天4夜完美攻略✨避开人潮玩转上海，人均3500玩到爽！🍃\n\n2️⃣ **旅行概览**\n📍目的地：上海\n⏰天数：5天4夜\n🌸最佳季节：春天（3-5月）秋天（9-11月）\n💰预算：3500元（含住宿交通）\n📌适合人群：文艺青年、美食爱好者、城市探索家\n\n3️⃣ **行程安排推荐**\nDay1：抵达上海→入住人民广场附近→南京路步行街→外滩夜景\nDay2：上...","level":"info","message":"Generated copy successfully","timestamp":"2026-02-08T12:10:28.624Z"}
 {"level":"info","message":"Generated Xiaohongshu copy successfully","timestamp":"2026-02-08T12:10:28.624Z"}
+{"level":"info","message":"Server running on port 8015","timestamp":"2026-02-09T02:51:16.861Z"}
+{"level":"info","message":"Server running on port 8015","timestamp":"2026-02-09T02:51:38.543Z"}

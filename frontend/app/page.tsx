@@ -1,143 +1,196 @@
 'use client';
-import { useState, useCallback } from 'react';
-import SceneSelector from './components/SceneSelector';
-import SceneConfig from './components/SceneConfig';
-import CopyEditor from './components/CopyEditor';
-import CopyPreview from './components/CopyPreview';
+import { useRouter } from 'next/navigation';
 
-export default function Home() {
-  const [selectedScene, setSelectedScene] = useState<string | null>(null);
-  const [sceneConfig, setSceneConfig] = useState<any>({});
-  const [generatedCopy, setGeneratedCopy] = useState<string>('');
-  const [loading, setLoading] = useState(false);
+interface AgentItem {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  route?: string;
+}
 
-  const handleSceneSelect = useCallback((sceneId: string) => {
-    setSelectedScene(sceneId);
-    setGeneratedCopy('');
-  }, []);
+export default function AgentHall() {
+  const router = useRouter();
 
-  const handleConfigChange = useCallback((config: any) => {
-    setSceneConfig(config);
-  }, []);
-
-  const handleCopyChange = useCallback((content: string) => {
-    setGeneratedCopy(content);
-  }, []);
-
-  const generateCopy = async () => {
-    if (!selectedScene) {
-      alert('请先选择一个文案场景');
-      return;
+  // Agent数据，包含小红书agent作为第一个元素
+  const agents: AgentItem[] = [
+    {
+      id: 'xiaohongshu',
+      name: '小红书Agent',
+      description: '智能生成小红书平台优质文案',
+      icon: '📝',
+      route: '/xiaohongshu'
+    },
+    {
+      id: 'marketing',
+      name: '营销Agent',
+      description: '专业营销文案与策略生成',
+      icon: '📈'
+    },
+    {
+      id: 'research',
+      name: '研究Agent',
+      description: '深度调研与分析报告生成',
+      icon: '🔍'
+    },
+    {
+      id: 'travel',
+      name: '旅行Agent',
+      description: '旅行规划与攻略生成',
+      icon: '✈️'
+    },
+    {
+      id: 'hr',
+      name: 'HR Agent',
+      description: '人力资源管理与招聘',
+      icon: '👥'
+    },
+    {
+      id: 'media',
+      name: '媒体Agent',
+      description: '媒体内容与新闻稿生成',
+      icon: '📺'
+    },
+    {
+      id: 'ecommerce',
+      name: '电商Agent',
+      description: '电商运营与产品描述',
+      icon: '🛒'
+    },
+    {
+      id: 'social',
+      name: '社交Agent',
+      description: '社交媒体内容与互动',
+      icon: '🌐'
+    },
+    {
+      id: 'language',
+      name: '语言Agent',
+      description: '多语言翻译与内容优化',
+      icon: '🌍'
+    },
+    {
+      id: 'product',
+      name: '产品Agent',
+      description: '产品设计与用户研究',
+      icon: '📱'
     }
+  ];
 
-    // 验证必填字段
-    const requiredFields = getRequiredFields(selectedScene);
-    const missingFields = requiredFields.filter(field => !sceneConfig[field]?.trim());
-    if (missingFields.length > 0) {
-      alert(`请填写必填字段：${missingFields.join('、')}`);
-      return;
+  const handleAgentClick = (agent: AgentItem) => {
+    if (agent.route) {
+      // 直接导航，依赖布局文件的动画效果
+      router.push(agent.route);
+    } else {
+      // 对于未实现的Agent，显示提示
+      alert(`${agent.name} 正在开发中，敬请期待！`);
     }
-
-    setLoading(true);
-    
-    try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8015';
-      const response = await fetch(`${API_URL}/xiaohongshu/copy`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          scene: selectedScene,
-          config: sceneConfig
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setGeneratedCopy(data.copy);
-    } catch (error) {
-      console.error('生成文案失败:', error);
-      alert('生成文案失败，请稍后重试');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getRequiredFields = (sceneId: string): string[] => {
-    const requiredFieldsMap: Record<string, string[]> = {
-      beauty: ['productName', 'brand', 'usageFeel', 'effect', 'recommendation'],
-      fashion: ['clothingType', 'style', 'matchingTips', 'scenario', 'usageFeel'],
-      travel: ['destination', 'duration', 'attractions', 'food', 'tips', 'experience'],
-      food: ['restaurantName', 'location', 'cuisineType', 'signatureDishes', 'taste', 'recommendation'],
-      home: ['productName', 'category', 'usageScenario', 'functionality', 'usageFeel', 'recommendation'],
-      fitness: ['workoutType', 'benefits', 'experience', 'tips'],
-      parenting: ['babyAge', 'topic', 'problem', 'solution', 'experience', 'tips'],
-      tech: ['productName', 'brand', 'specs', 'performance', 'userExperience', 'pros', 'recommendation']
-    };
-    return requiredFieldsMap[sceneId] || [];
   };
 
   return (
-    <main className="container">
-      <header style={{ marginBottom: '2rem', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 700, backgroundImage: 'linear-gradient(to right, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
-          小红书文案编辑Agent
+    <main className="container" style={{ alignItems: 'center' }}>
+      {/* 页面标题 */}
+      <header style={{ 
+        marginBottom: '3rem', 
+        textAlign: 'center',
+        width: '100%'
+      }}>
+        <h1 style={{ 
+          fontSize: '3rem', 
+          fontWeight: 700, 
+          backgroundImage: 'linear-gradient(to right, #60a5fa, #a78bfa)', 
+          WebkitBackgroundClip: 'text', 
+          color: 'transparent',
+          marginBottom: '1rem'
+        }}>
+          Agent大厅
         </h1>
-        <p style={{ color: '#94a3b8' }}>智能生成八大场景优质文案</p>
+        <p style={{ 
+          color: '#94a3b8',
+          fontSize: '1.1rem'
+        }}>
+          探索AI驱动的专业助手，赋能各类业务场景
+        </p>
       </header>
 
-      {/* 场景选择 */}
-      <SceneSelector
-        selectedScene={selectedScene}
-        onSelectScene={handleSceneSelect}
-      />
-
-      {/* 场景参数配置 */}
-      <SceneConfig
-        sceneId={selectedScene}
-        onConfigChange={handleConfigChange}
-      />
-
-      {/* 生成按钮 */}
-      {selectedScene && (
-        <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-          <button
-            onClick={generateCopy}
-            disabled={loading}
+      {/* Agent矩阵布局 */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+        gridTemplateRows: 'repeat(6, auto)',
+        gap: '1.5rem',
+        maxWidth: '1400px',
+        width: '100%',
+        marginBottom: '3rem'
+      }}>
+        {agents.map((agent) => (
+          <div
+            key={agent.id}
+            onClick={() => handleAgentClick(agent)}
             style={{
-              padding: '1rem 3rem',
-              backgroundColor: '#60a5fa',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.5rem',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              fontSize: '1.1rem',
-              fontWeight: 600,
-              transition: 'background 0.2s',
-              opacity: loading ? 0.5 : 1
+              background: 'var(--secondary)',
+              border: agent.id === 'xiaohongshu' ? '2px solid #60a5fa' : '1px solid #334155',
+              borderRadius: '1rem',
+              padding: '1.5rem',
+              textAlign: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: agent.id === 'xiaohongshu' ? '0 0 20px rgba(96, 165, 250, 0.3)' : 'none'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.boxShadow = agent.id === 'xiaohongshu' 
+                ? '0 10px 30px rgba(96, 165, 250, 0.4)' 
+                : '0 5px 15px rgba(0, 0, 0, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = agent.id === 'xiaohongshu' 
+                ? '0 0 20px rgba(96, 165, 250, 0.3)' 
+                : 'none';
             }}
           >
-            {loading ? '生成中...' : '生成文案'}
-          </button>
-        </div>
-      )}
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+              {agent.icon}
+            </div>
+            <h3 style={{ 
+              fontSize: '1.2rem', 
+              fontWeight: 600, 
+              marginBottom: '0.5rem',
+              color: agent.id === 'xiaohongshu' ? '#60a5fa' : 'var(--foreground)'
+            }}>
+              {agent.name}
+            </h3>
+            <p style={{ 
+              color: '#94a3b8', 
+              fontSize: '0.9rem',
+              lineHeight: '1.4'
+            }}>
+              {agent.description}
+            </p>
+            {agent.route && (
+              <div style={{ 
+                marginTop: '1rem',
+                fontSize: '0.8rem',
+                color: '#60a5fa'
+              }}>
+                点击进入 →
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
 
-      {/* 文案编辑 */}
-      <CopyEditor
-        initialContent={generatedCopy}
-        onContentChange={handleCopyChange}
-        loading={loading}
-      />
-
-      {/* 文案预览 */}
-      <CopyPreview
-        content={generatedCopy}
-        sceneId={selectedScene}
-      />
+      {/* 页脚 */}
+      <footer style={{ 
+        marginTop: '3rem', 
+        textAlign: 'center', 
+        color: '#64748b',
+        fontSize: '0.9rem',
+        width: '100%'
+      }}>
+        <p>© 2026 Agent系统 | 智能赋能未来</p>
+      </footer>
     </main>
   );
 }

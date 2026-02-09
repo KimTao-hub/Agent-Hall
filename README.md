@@ -1,8 +1,34 @@
-# 后端代码流程解析文档
+# Agent-Dev
+- 主要功能：提供Agent大厅
+  - 小红书智能文案生成器：根据用户输入的场景和参数，生成符合小红书风格的文案
+  - 其余Agent待开发...
 
-## 1. 系统架构概述
 
-### 1.1 技术栈
+## 1. 后端系统概述
+### 1.0 前言
+- 本项目后端系统基于Node.js和Express.js构建，主要负责处理前端请求、调用OpenAI API生成文案、管理系统配置等核心功能。
+- 系统采用RESTful API设计，前端通过HTTP请求与后端交互。
+### 1.1 环境配置
+- **.env文件**:
+  ```
+  DEEPSEEK_API_KEY=your_api_key_here
+  PORT=8015
+  ```
+### 1.2 开发环境启动
+```bash
+cd backend
+pnpm install
+pnpm run dev
+```
+### 1.3 生产环境部署
+```bash
+cd backend
+pnpm install
+pnpm run build
+pnpm start
+```
+
+### 1.4 技术栈
 - **编程语言**: TypeScript
 - **Web框架**: Express.js
 - **AI集成**: OpenAI SDK (集成DeepSeek API)
@@ -11,7 +37,7 @@
 - **安全措施**: express-rate-limit
 - **包管理**: pnpm
 
-### 1.2 系统架构图
+### 1.5 系统架构图
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │   前端应用      │     │   后端服务      │     │  DeepSeek API   │
@@ -202,30 +228,6 @@
 - **流式处理**:
   - 减少用户等待时间
   - 提高系统响应速度
-
-## 7. 配置与部署
-
-### 7.1 环境配置
-- **.env文件**:
-  ```
-  DEEPSEEK_API_KEY=your_api_key_here
-  PORT=8015
-  ```
-
-### 7.2 开发环境启动
-```bash
-cd backend
-pnpm install
-pnpm run dev
-```
-
-### 7.3 生产环境部署
-```bash
-cd backend
-pnpm install
-pnpm run build
-pnpm start
-```
 
 ## 8. 代码结构
 
